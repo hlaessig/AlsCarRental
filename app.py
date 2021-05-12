@@ -130,25 +130,25 @@ def dashboard_main(connection):
 
         if event == 'Get':
             get_id = values['-LOOKUP_ID-']
+            window.close()
             dashboard_get_customer(connection, get_id)
             break
 
         if event == 'Clear':
+            window.close()
             dashboard_main(connection)
             break
 
-        if event == 'Add':
-            sql = '''
-                INSERT INTO teacher (first_name, last_name, phone_no, email, credit_card) 
-                VALUES (%s, %s, %s, %s, %s)
-                '''
+        if event == 'Add User':
+            add = '''
+                INSERT INTO customer(first_name, last_name, phone_no, email, credit_card) 
+                VALUES(%s, %s, %s, %s, %s);
+                ''' % (values['-NEW_FIRSTNAME-'], values['-NEW_LASTNAME-'], values['-NEW_PHONE-'],
+                       values['-NEW_EMAIL-'], values['-NEW_CREDIT_CARD-'])
 
-            val = [
-                (values['-NEW_FIRSTNAME-']), (values['-NEW_LASTNAME-']), (values['-NEW_PHONE-']),
-                (values['-NEW_EMAIL-']), (values['-NEW_CREDIT_CARD-'])]
-
-            execute_list_query(connection, sql, val)
-
+            print(add)
+            execute_query(connection, add)
+            window.close()
             dashboard_main(connection)
             break
 
@@ -158,7 +158,6 @@ def dashboard_main(connection):
 
 
 def dashboard_get_customer(connection, get_id):
-    global phone, email, customer_id, first_name, last_name, credit_card
     q1 = "SELECT * FROM customer WHERE customer_id = '%s'" % get_id
     print(q1)
 
@@ -228,10 +227,12 @@ def dashboard_get_customer(connection, get_id):
 
         if event == 'Get':
             get_id = values['-LOOKUP_ID-']
+            window.close()
             dashboard_get_customer(connection, get_id)
             break
 
         if event == 'Clear':
+            window.close()
             dashboard_main(connection)
             break
 
@@ -240,7 +241,7 @@ def dashboard_get_customer(connection, get_id):
             DELETE FROM customer
             WHERE customer_id = '%s';
             ''' % get_id
-
+            window.close()
             confirm_Delete(get_id, connection, delete_course)
             break
 
@@ -254,6 +255,7 @@ def dashboard_get_customer(connection, get_id):
                    values['-EMAIL-'], values['-CREDIT_CARD-'], get_id)
             print(update)
             execute_query(connection, update)
+            window.close()
             dashboard_get_customer(connection, get_id)
             break
 
@@ -264,18 +266,18 @@ def dashboard_get_customer(connection, get_id):
 
 def confirm_Delete(customer_id, connection, delete):
     window = sg.Window('Confirm Action',
-                       [[sg.Text('Are you sure you want to delete %s' % customer_id)],
+                       [[sg.Text('Are you sure you want to delete customer_id %s' % customer_id)],
                         [sg.OK(), sg.Cancel()]])
     event, values = window.read()
 
     if event != 'OK':
-        dashboard_get_customer(connection, customer_id)
         window.close()
+        dashboard_get_customer(connection, customer_id)
 
     else:
         execute_query(connection, delete)
-        dashboard_main(connection)
         window.close()
+        dashboard_main(connection)
 
 
 # -- MAIN -- #
